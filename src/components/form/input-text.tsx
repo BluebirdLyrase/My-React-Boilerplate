@@ -1,17 +1,34 @@
 import { Input } from 'antd';
-import React, { Fragment } from 'react';
+import React, { ChangeEvent, Fragment } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
-import { InputFooter, InputHeader } from '../component/Text';
-import { InputFormSkeleton } from '../component/InputFormSkeleton';
+import { InputFooter, InputHeader } from './decoration/Text';
+import { InputFormSkeleton } from './decoration/InputFormSkeleton';
+import {
+  HideError,
+  HideRequire,
+  InputLabel,
+  InputName,
+  ValidationRules,
+} from './input';
 
-export const InputTextComponent = ({
-  rules = {},
+export const InputTextComponent: React.FC<{
+  rules: ValidationRules;
+  name: InputName;
+  label: InputLabel;
+  placeholder?: string;
+  disabled?: boolean;
+  inputType?: 'text' | 'tel' | 'time' | 'url' | 'password' | 'email';
+  maxLength?: number;
+  isLoading?: boolean;
+  hideError?: HideError;
+  hideRequire?: HideRequire;
+}> = ({
+  rules = { required: false },
   name,
   label,
-  placeholder,
-  disabled,
+  placeholder = '',
+  disabled = false,
   inputType = 'text',
-  inputStep = '0.01',
   maxLength = null,
   isLoading = false,
   hideError = false,
@@ -19,13 +36,14 @@ export const InputTextComponent = ({
   ...propsInput
 }) => {
   const useFormMethod = useFormContext();
-  if (!useFormMethod) throw new Error(`InputTextComponent must be warp by FormProvider`);
-  if (!name) throw new Error(`must provide name for InputTextComponent`);
+  if (!useFormMethod)
+    throw new Error(`InputTextComponent must be warp by FormProvider`);
 
   const { setValue, control } = useFormMethod;
 
-  function handleChange(e) {
-    setValue(name, e.target.value, { shouldDirty: true });
+  function handleChange(event: ChangeEvent) {
+    const value = (event.target as HTMLInputElement).value;
+    setValue(name, value, { shouldDirty: true });
   }
 
   const { field, fieldState } = useController({
@@ -50,9 +68,8 @@ export const InputTextComponent = ({
           name={name}
           value={value}
           type={inputType}
-          step={inputStep}
           disabled={disabled}
-          onChange={(e) => (propsInput.handleChange ? propsInput.handleChange(e) : handleChange(e))}
+          onChange={handleChange}
           placeholder={placeholder}
           maxLength={maxLength}
           {...propsInput}

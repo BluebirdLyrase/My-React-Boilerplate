@@ -28,7 +28,7 @@ export const renderTypeError: (
 };
 
 type InputFooterProps = {
-  error: FieldError;
+  error?: FieldError;
   hideError?: HideError;
   label: InputLabel;
 };
